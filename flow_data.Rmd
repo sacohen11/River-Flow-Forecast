@@ -1,0 +1,98 @@
+---
+title: "load_flow_data.rmd"
+output: html_document
+---
+
+```{r bring in loadPkg function, echo=F}
+# use this function to conveniently load libraries and work smoothly with knitting
+# can add quietly=T option to the require() function
+# note that using this function requires quotes around the package name, as you would when installing packages.
+loadPkg = function(x) { if (!require(x,character.only=T, quietly =T)) { install.packages(x,dep=T,repos="http://cran.us.r-project.org"); if(!require(x,character.only=T)) stop("Package not found") } }
+# unload/detact package when done using it 
+detach_package = function(pkg, character.only = FALSE) { if(!character.only) { pkg <- deparse(substitute(pkg)) } 
+  search_item <- paste("package", pkg,sep = ":") 
+  while(search_item %in% search()) { detach(search_item, unload = TRUE, character.only = TRUE) } 
+}
+```
+
+```{r setup and load packages, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+loadPkg("dataRetrieval")
+loadPkg('dplyr')
+loadPkg('writexl')
+```
+
+## Find a site in Missouri
+
+``` {r use USGS API to get MO sites}
+dataAvailableMO <- whatNWISdata(stateCd = "MO", service="dv", statCd="all")
+dataAvailableMO
+```
+
+Check the sites with the most information.
+``` {r get the site with the most obs in MO}
+mississippiRiverSites <- dataAvailableMO %>%
+        group_by(site_no) %>%
+        filter(grepl('Mississippi River', station_nm) | grepl('MISSISSIPPI RIVER', station_nm))
+mississippiRiverSites
+
+sitesWithMostData <- mississippiRiverSites %>%
+        group_by(site_no) %>%
+        summarise(count = n()) %>%
+        arrange(desc(count)) %>%
+        head(10)
+sitesWithMostData
+  
+```
+
+The St. Louis site has data that goes back the furthest. Let's use that and we can merge it with NOAA data later.
+``` {r check out the attributes of the top 5 sites}
+topSitesData <- merge(x=sitesWithMostData, y=dataAvailableMO, x.by=site_no, y.by=site_no)
+topSitesData
+```
+Here we are selecting the St. Louis data from 1900-present and outputting.
+``` {r select the St. Louis site and get data only for daily mean discharge}
+stLouisData <- readNWISdv(siteNumbers = '07010000', parameterCd = '00060', startDate = '1900-01-01', statCd = '00003')
+stLouisData <- renameNWISColumns(stLouisData)
+stLouisData
+write.csv(stLouisData, file="./data/st_louis_flow.csv", row.names = TRUE)
+```
+
+## Find a site in Iowa
+``` {r use USGS API to get MN sites}
+dataAvailableIA <- whatNWISdata(stateCd = "IA", service="dv", statCd="all")
+dataAvailableIA
+```
+
+Check the sites with the most information.
+``` {r get the site with the most obs in MN}
+library(dplyr)
+
+mississippiRiverSites <- dataAvailableIA %>%
+        group_by(site_no) %>%
+        filter(grepl('Mississippi River', station_nm) | grepl('MISSISSIPPI RIVER', station_nm))
+mississippiRiverSites
+
+sitesWithMostData <- mississippiRiverSites %>%
+        group_by(site_no) %>%
+        summarise(count = n()) %>%
+        arrange(desc(count)) %>%
+        head(10)
+sitesWithMostData
+  
+```
+
+The Clinton site has data that goes back the furthest. Let's use that and we can merge it with NOAA data later.
+``` {r check out the attributes of the top 5 sites}
+topSitesData <- merge(x=sitesWithMostData, y=dataAvailableIA, x.by=site_no, y.by=site_no)
+topSitesData
+```
+
+Here we are selecting the Clinton data from 1900-present and outputting.
+``` {r select the Clinton, IA site and get data only for daily mean discharge}
+clintonData <- readNWISdv(siteNumbers = '05420500', parameterCd = '00060', startDate = '1900-01-01', statCd = '00003')
+clintonData <- renameNWISColumns(clintonData)
+clintonData
+write.csv(clintonData, file="./data/clinton_flow.csv", row.names = TRUE)
+```
+
