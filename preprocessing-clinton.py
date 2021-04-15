@@ -58,6 +58,9 @@ print("-" * 50)
 print(clinton)
 print(clinton.describe())
 
+
+print(clinton["Date"][4177])
+
 # PRCP = Precipitation (tenths of mm)
 # SNOW = Snowfall (mm)
 # SNWD = Snow depth (mm)
@@ -66,7 +69,7 @@ print(clinton.describe())
 
 
 
-
+clinton.to_csv('clinton.csv', index=False)
 
 
 
