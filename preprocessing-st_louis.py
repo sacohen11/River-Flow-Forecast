@@ -82,7 +82,8 @@ print(st_louis.describe())
 # TMAX = Maximum temperature (tenths of degrees C)
 # TMIN = Minimum temperature (tenths of degrees C)
 
-
+# Output
+st_louis.to_csv("./data/st_louis_preprocessed.csv")
 
 
 
