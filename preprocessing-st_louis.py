@@ -51,6 +51,7 @@ st_louis_flow = st_louis_flow[['Date', "Flow"]]
 
 
 #Droping everything before 1969
+print(st_louis_weather2["DATE"][11229])
 st_louis_weather2 = st_louis_weather2[11229:]
 
 ##Concatenating Weather rows datasets
@@ -82,7 +83,7 @@ print(st_louis.describe())
 # TMAX = Maximum temperature (tenths of degrees C)
 # TMIN = Minimum temperature (tenths of degrees C)
 
-
+print(st_louis["Date"][4177])
 
 
 
