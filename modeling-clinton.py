@@ -12,8 +12,8 @@ from scipy import signal
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima_model import ARMA
 
-sys.path.append("/Users/luisabrigo/GWU/TimeSeries/Toolbox.py")
-from Toolbox import *
+sys.path.append("/functions_clinton.py")
+from functions_clinton import *
 
 # import Toolbox
 
